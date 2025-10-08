@@ -15,7 +15,13 @@ window.IMAGES_DATA = {
         { file: "(11).jpg", type: "real" },
         { file: "(12).jpg", type: "real" },
         { file: "(13).jpg", type: "real" },
-        { file: "(14).jpg", type: "real" }
+        { file: "(14).jpg", type: "real" },
+        { file: "(15).jpg", type: "real" },
+        { file: "(16).jpg", type: "real" },
+        { file: "(17).jpg", type: "real" },
+        { file: "(18).jpg", type: "real" },
+        { file: "(19).jpg", type: "real" },
+        { file: "(20).jpg", type: "real" }
     ],
     fake: [
         { file: "(1).jpg", type: "fake" },
@@ -33,6 +39,15 @@ window.IMAGES_DATA = {
         { file: "(13).jpg", type: "fake" },
         { file: "(14).jpg", type: "fake" },
         { file: "(15).jpg", type: "fake" },
-        { file: "(16).jpg", type: "fake" }
+        { file: "(16).jpg", type: "fake" },
+        { file: "(17).jpg", type: "fake" },
+        { file: "(18).jpg", type: "fake" },
+        { file: "(19).jpg", type: "fake" },
+        { file: "(20).jpg", type: "fake" },
+        { file: "(21).jpg", type: "fake" },
+        { file: "(22).jpg", type: "fake" },
+        { file: "(23).jpg", type: "fake" },
+        { file: "(24).jpg", type: "fake" },
+        { file: "(25).jpg", type: "fake" }
     ]
 };
