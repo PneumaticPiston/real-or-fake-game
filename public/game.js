@@ -126,11 +126,9 @@ class RealOrFakeGame {
         
         const img = document.createElement('img');
         img.className = 'game-image';
-        img.src = `https://github.com/PneumaticPiston/real-or-fake-game/blob/main/images/${currentImage.type}/${currentImage.file}`;
-        
-        await this.loadImagePromise(img);
-        
-        imageContainer.appendChild(img);
+        img.src = `images/${currentImage.type}/${currentImage.file}`;
+
+        await this.loadImagePromise(img);        imageContainer.appendChild(img);
         
         this.elements.gameArea.innerHTML = '';
         this.elements.gameArea.appendChild(imageContainer);
