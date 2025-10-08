@@ -15,6 +15,8 @@ class RealOrFakeGame {
         this.shuffledImages = [];
         this.currentAnswer = null;
         this.gameComplete = false;
+        this.answerHistory = [];  // Track user answers and correct answers
+        this.isNavigating = false;  // Track if user is navigating vs playing
 
         this.elements = {
             gameArea: document.getElementById('gameArea'),
@@ -28,7 +30,10 @@ class RealOrFakeGame {
             background: document.getElementById('background'),
             backgroundLeft: document.getElementById('backgroundLeft'),
             backgroundRight: document.getElementById('backgroundRight'),
-            instructions: document.getElementById('instructions')
+            instructions: document.getElementById('instructions'),
+            prevButton: document.getElementById('prevButton'),
+            nextButton: document.getElementById('nextButton'),
+            navigationMessage: document.getElementById('navigationMessage')
         };
 
         this.init();
@@ -80,12 +85,16 @@ class RealOrFakeGame {
     setupEventListeners() {
         this.elements.btnReal.addEventListener('click', () => this.makeGuess('real'));
         this.elements.btnFake.addEventListener('click', () => this.makeGuess('fake'));
+        this.elements.prevButton.addEventListener('click', () => this.navigateToPrevious());
+        this.elements.nextButton.addEventListener('click', () => this.navigateToNext());
     }
 
     startGame() {
         if (this.totalImages === 0) return;
 
         this.elements.loading.style.display = 'none';
+        this.elements.prevButton.style.display = 'block';
+        this.elements.nextButton.style.display = 'block';
 
         if (this.mode === 'single') {
             this.elements.buttons.style.display = 'flex';
@@ -107,9 +116,14 @@ class RealOrFakeGame {
             return;
         }
 
-        this.disableButtons(true);
-        this.elements.feedback.textContent = '';
-        this.elements.feedback.className = 'feedback';
+        this.updateNavigationButtons();
+        this.updateNavigationMessage();
+        
+        if (!this.isNavigating) {
+            this.disableButtons(true);
+            this.elements.feedback.textContent = '';
+            this.elements.feedback.className = 'feedback';
+        }
 
         if (this.mode === 'single') {
             await this.showSingleImage();
@@ -117,7 +131,11 @@ class RealOrFakeGame {
             await this.showComparisonImages();
         }
 
-        this.disableButtons(false);
+        if (!this.isNavigating) {
+            this.disableButtons(false);
+        }
+        
+        this.updateButtonStates();
     }
 
     async showSingleImage() {
@@ -191,6 +209,8 @@ class RealOrFakeGame {
         this.currentAnswer = 'comparison';
         this.leftImageType = images[shuffledPositions[0]].type;
         this.rightImageType = images[shuffledPositions[1]].type;
+        this.currentLeftImage = images[shuffledPositions[0]];
+        this.currentRightImage = images[shuffledPositions[1]];
     }
 
     loadImagePromise(img) {
@@ -289,11 +309,21 @@ class RealOrFakeGame {
     }
 
     makeGuess(guess) {
+        if (this.isNavigating) return;  // Don't allow guesses while navigating
+        
         let correct = false;
 
         if (this.mode === 'single') {
             correct = guess === this.currentAnswer;
         }
+
+        // Store answer in history
+        this.answerHistory[this.currentImageIndex] = {
+            userGuess: guess,
+            correctAnswer: this.currentAnswer,
+            isCorrect: correct,
+            imageData: this.mode === 'single' ? this.shuffledImages[this.currentImageIndex] : null
+        };
 
         if (correct) {
             this.score++;
@@ -304,18 +334,35 @@ class RealOrFakeGame {
             this.elements.feedback.className = 'feedback incorrect';
         }
 
+        // Add visual feedback to image
+        this.addImageFeedback(correct);
+
         this.elements.score.textContent = this.score;
         this.currentImageIndex++;
 
         setTimeout(() => {
             this.showNextImage();
-            // The delay after answering a question. Wait, sleep, timeout
-        }, 500);
+        }, 1500);  // Increased delay to see animation
     }
 
     makeComparisonGuess(side) {
+        if (this.isNavigating) return;  // Don't allow guesses while navigating
+        
         const clickedImageType = side === 'left' ? this.leftImageType : this.rightImageType;
         const correct = clickedImageType === 'fake';
+
+        // Store answer in history
+        this.answerHistory[this.currentImageIndex] = {
+            userGuess: side,
+            correctAnswer: this.leftImageType === 'fake' ? 'left' : 'right',
+            isCorrect: correct,
+            imageData: { 
+                leftType: this.leftImageType, 
+                rightType: this.rightImageType,
+                leftImage: this.currentLeftImage,
+                rightImage: this.currentRightImage
+            }
+        };
 
         if (correct) {
             this.score++;
@@ -326,12 +373,120 @@ class RealOrFakeGame {
             this.elements.feedback.className = 'feedback incorrect';
         }
 
+        // Add visual feedback to images
+        this.addComparisonImageFeedback(side, correct);
+
         this.elements.score.textContent = this.score;
         this.currentImageIndex++;
 
         setTimeout(() => {
             this.showNextImage();
         }, 2000);
+    }
+
+    navigateToPrevious() {
+        if (this.currentImageIndex > 0) {
+            this.currentImageIndex--;
+            this.isNavigating = true;
+            this.showNextImage();
+        }
+    }
+
+    navigateToNext() {
+        if (this.currentImageIndex < this.answerHistory.length - 1) {
+            this.currentImageIndex++;
+            this.isNavigating = true;
+            this.showNextImage();
+        } else if (this.currentImageIndex === this.answerHistory.length - 1 && !this.gameComplete) {
+            // Go to next unseen image
+            this.currentImageIndex++;
+            this.isNavigating = false;
+            this.showNextImage();
+        }
+    }
+
+    updateNavigationButtons() {
+        // Previous button - disabled if at first image
+        this.elements.prevButton.disabled = this.currentImageIndex === 0;
+        
+        // Next button - disabled if at the last answered image and game not complete
+        const canGoNext = this.currentImageIndex < this.answerHistory.length - 1 || 
+                         (this.currentImageIndex < this.totalImages - 1 && !this.gameComplete);
+        this.elements.nextButton.disabled = !canGoNext;
+    }
+
+    updateNavigationMessage() {
+        const history = this.answerHistory[this.currentImageIndex];
+        
+        if (this.isNavigating && history) {
+            const correctAnswer = history.correctAnswer;
+            const messageText = `This image was ${correctAnswer.toUpperCase()}`;
+            
+            this.elements.navigationMessage.textContent = messageText;
+            this.elements.navigationMessage.className = `navigation-message ${correctAnswer}`;
+            this.elements.navigationMessage.style.display = 'block';
+        } else {
+            this.elements.navigationMessage.style.display = 'none';
+        }
+    }
+
+    updateButtonStates() {
+        if (this.isNavigating && this.mode === 'single') {
+            const history = this.answerHistory[this.currentImageIndex];
+            if (history) {
+                // Reset button states
+                this.elements.btnReal.classList.remove('selected', 'unselected');
+                this.elements.btnFake.classList.remove('selected', 'unselected');
+                
+                // Highlight the user's choice and gray out the other
+                if (history.userGuess === 'real') {
+                    this.elements.btnReal.classList.add('selected');
+                    this.elements.btnFake.classList.add('unselected');
+                } else {
+                    this.elements.btnFake.classList.add('selected');
+                    this.elements.btnReal.classList.add('unselected');
+                }
+                
+                // Disable buttons during navigation
+                this.elements.btnReal.disabled = true;
+                this.elements.btnFake.disabled = true;
+            }
+        } else if (!this.isNavigating && this.mode === 'single') {
+            // Reset to normal state when not navigating
+            this.elements.btnReal.classList.remove('selected', 'unselected');
+            this.elements.btnFake.classList.remove('selected', 'unselected');
+            this.elements.btnReal.disabled = false;
+            this.elements.btnFake.disabled = false;
+        }
+    }
+
+    addImageFeedback(correct) {
+        const images = document.querySelectorAll('.game-image');
+        images.forEach(img => {
+            img.classList.remove('correct', 'incorrect');
+            img.classList.add(correct ? 'correct' : 'incorrect');
+            
+            // Remove animation class after animation completes
+            setTimeout(() => {
+                img.classList.remove('correct', 'incorrect');
+            }, 600);
+        });
+    }
+
+    addComparisonImageFeedback(selectedSide, correct) {
+        const images = document.querySelectorAll('.game-image');
+        images.forEach((img, index) => {
+            const isSelected = (selectedSide === 'left' && index === 0) || 
+                              (selectedSide === 'right' && index === 1);
+            
+            if (isSelected) {
+                img.classList.add(correct ? 'correct' : 'incorrect');
+                
+                setTimeout(() => {
+                    img.classList.remove('correct', 'incorrect');
+                }, 600);
+            }
+        });
     }
 
     async endGame() {
@@ -342,21 +497,107 @@ class RealOrFakeGame {
         this.elements.backgroundLeft.classList.remove('loaded');
         this.elements.backgroundRight.classList.remove('loaded');
 
+        // Hide navigation buttons and message
+        this.elements.prevButton.style.display = 'none';
+        this.elements.nextButton.style.display = 'none';
+        this.elements.navigationMessage.style.display = 'none';
+
         // No longer need to submit score to server - it's now a static game
         console.log(`Game completed! Final score: ${this.score}/${this.totalImages} (${Math.round(this.score/this.totalImages*100)}%)`);
 
         const percentage = Math.round((this.score / this.totalImages) * 100);
 
+        // Generate results summary
+        const resultsList = this.generateResultsSummary();
+
         this.elements.gameArea.innerHTML = `
             <div class="game-complete">
                 <h2>Game Complete!</h2>
                 <p>Final Score: ${this.score}/${this.totalImages} (${percentage}%)</p>
+                <div class="results-summary">
+                    <h3>Your Answers:</h3>
+                    <div class="results-list">
+                        ${resultsList}
+                    </div>
+                </div>
                 <p>Refresh the page to play again</p>
             </div>
         `;
 
         this.elements.buttons.style.display = 'none';
         this.elements.instructions.style.display = 'none';
+    }
+
+    generateResultsSummary() {
+        if (!this.answerHistory || this.answerHistory.length === 0) {
+            return '<p>No answers recorded.</p>';
+        }
+
+        return this.answerHistory.map((answer, index) => {
+            const isCorrect = answer.isCorrect;
+            const correctClass = isCorrect ? 'correct-result' : 'incorrect-result';
+            const correctIcon = isCorrect ? '✓' : '✗';
+            
+            let resultText = '';
+            if (this.mode === 'single') {
+                const imageData = answer.imageData;
+                const imageSrc = `images/${imageData.type}/${imageData.file}`;
+                
+                resultText = `
+                    <div class="result-item ${correctClass}">
+                        <div class="result-image">
+                            <img src="${imageSrc}" alt="Question ${index + 1}" />
+                        </div>
+                        <div class="result-details">
+                            <div class="result-header">
+                                <span class="result-number">${index + 1}.</span>
+                                <span class="result-icon">${correctIcon}</span>
+                            </div>
+                            <div class="result-text">
+                                Image was <strong>${answer.correctAnswer.toUpperCase()}</strong>, 
+                                you chose <strong>${answer.userGuess.toUpperCase()}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Comparison mode - show both images
+                const imageData = answer.imageData;
+                const leftImageSrc = `images/${imageData.leftImage.type}/${imageData.leftImage.file}`;
+                const rightImageSrc = `images/${imageData.rightImage.type}/${imageData.rightImage.file}`;
+                
+                // Determine which image was fake based on the stored data
+                const fakeImageSrc = imageData.leftType === 'fake' ? leftImageSrc : rightImageSrc;
+                const realImageSrc = imageData.leftType === 'real' ? leftImageSrc : rightImageSrc;
+                
+                resultText = `
+                    <div class="result-item ${correctClass}">
+                        <div class="result-images">
+                            <div class="comparison-image">
+                                <img src="${realImageSrc}" alt="Real image" />
+                                <span class="image-label real-label">REAL</span>
+                            </div>
+                            <div class="comparison-image">
+                                <img src="${fakeImageSrc}" alt="Fake image" />
+                                <span class="image-label fake-label">FAKE</span>
+                            </div>
+                        </div>
+                        <div class="result-details">
+                            <div class="result-header">
+                                <span class="result-number">${index + 1}.</span>
+                                <span class="result-icon">${correctIcon}</span>
+                            </div>
+                            <div class="result-text">
+                                Fake was on the <strong>${answer.correctAnswer.toUpperCase()}</strong>, 
+                                you chose <strong>${answer.userGuess.toUpperCase()}</strong>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return resultText;
+        }).join('');
     }
 }
 
