@@ -153,15 +153,13 @@ class RealOrFakeGame {
         
         const leftImg = document.createElement('img');
         leftImg.className = 'game-image';
-        leftImg.src = `https://github.com/PneumaticPiston/real-or-fake-game/blob/main/images/${images[shuffledPositions[0]].type}/${images[shuffledPositions[0]].file}?raw=true`;
+        leftImg.src = `images/${images[shuffledPositions[0]].type}/${images[shuffledPositions[0]].file}`;
         leftImg.dataset.type = images[shuffledPositions[0]].type;
-        
+
         const rightImg = document.createElement('img');
         rightImg.className = 'game-image';
-        rightImg.src = `https://github.com/PneumaticPiston/real-or-fake-game/blob/main/images/${images[shuffledPositions[1]].type}/${images[shuffledPositions[1]].file}?raw=true`;
-        rightImg.dataset.type = images[shuffledPositions[1]].type;
-        
-        await Promise.all([this.loadImagePromise(leftImg), this.loadImagePromise(rightImg)]);
+        rightImg.src = `images/${images[shuffledPositions[1]].type}/${images[shuffledPositions[1]].file}`;
+        rightImg.dataset.type = images[shuffledPositions[1]].type;        await Promise.all([this.loadImagePromise(leftImg), this.loadImagePromise(rightImg)]);
         
         const leftContainer = document.createElement('div');
         leftContainer.className = 'image-container';
