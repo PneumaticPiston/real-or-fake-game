@@ -45,9 +45,6 @@ window.IMAGES_DATA = {
         { file: "(19).jpg", type: "fake" },
         { file: "(20).jpg", type: "fake" },
         { file: "(21).jpg", type: "fake" },
-        { file: "(22).jpg", type: "fake" },
-        { file: "(23).jpg", type: "fake" },
-        { file: "(24).jpg", type: "fake" },
-        { file: "(25).jpg", type: "fake" }
+        { file: "(22).jpg", type: "fake" }
     ]
 };
