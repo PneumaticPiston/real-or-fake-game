@@ -309,7 +309,8 @@ class RealOrFakeGame {
 
         setTimeout(() => {
             this.showNextImage();
-        }, 2000);
+            // The delay after answering a question. Wait, sleep, timeout
+        }, 500);
     }
 
     makeComparisonGuess(side) {
