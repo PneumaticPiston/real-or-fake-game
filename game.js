@@ -158,7 +158,7 @@ class RealOrFakeGame {
 
         const leftImg = document.createElement('img');
         leftImg.className = 'game-image';
-        leftImg.src = `https://github.com/PneumaticPiston/real-or-fake-game/blob/main/images/images/${images[shuffledPositions[0]].type}/${images[shuffledPositions[0]].file}`;
+        leftImg.src = `https://github.com/PneumaticPiston/real-or-fake-game/blob/main/images/${images[shuffledPositions[0]].type}/${images[shuffledPositions[0]].file}`;
         leftImg.dataset.type = images[shuffledPositions[0]].type;
 
         const rightImg = document.createElement('img');
