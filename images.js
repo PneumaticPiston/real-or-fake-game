@@ -9,7 +9,6 @@ window.IMAGES_DATA = {
         { file: "(5).jpg", type: "real" },
         { file: "(6).jpg", type: "real" },
         { file: "(7).jpg", type: "real" },
-        { file: "(8).jpg", type: "real" },
         { file: "(9).jpg", type: "real" },
         { file: "(10).jpg", type: "real" },
         { file: "(11).jpg", type: "real" },
