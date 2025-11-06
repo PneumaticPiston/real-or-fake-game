@@ -109,7 +109,10 @@ class RealOrFakeGame {
     }
 
     async showNextImage() {
-        if (this.currentImageIndex >= this.totalImages) {
+        if (this.mode === 'single' && this.currentImageIndex >= this.shuffledImages.length) {
+            this.endGame();
+            return;
+        } else if (this.mode === 'compare' && this.currentImageIndex >= this.totalImages) {
             this.endGame();
             return;
         }
