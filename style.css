@@ -151,6 +151,11 @@ body {
     max-height: calc(100vh - 320px);
 }
 
+.double-image-container .game-image {
+    max-width: 47vw;
+    max-height: calc(100vh - 320px);
+}
+
 .single-image-container .game-image {
     max-width: 90vw !important;
     width: 60vw !important;
@@ -333,6 +338,7 @@ body {
 
 .results-summary {
     margin: 24px 0;
+    max-width: 70vw;
     max-height: 400px;
     overflow-y: auto;
     background: rgba(255, 255, 255, 0.05);
@@ -358,6 +364,7 @@ body {
     display: flex;
     align-items: flex-start;
     padding: 16px;
+    max-width: 100%;
     border-radius: 12px;
     font-size: 0.95rem;
     border-left: 4px solid;
@@ -434,7 +441,7 @@ body {
     gap: 12px;
 }
 
-.comparison-image {
+.compare-image {
     position: relative;
     width: 100px;
     height: 100px;
@@ -443,8 +450,9 @@ body {
     border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-.comparison-image img {
+.compare-image img {
     width: 100%;
+    max-width: 100px;
     height: 100%;
     object-fit: cover;
 }
@@ -497,7 +505,7 @@ body {
         height: 100px;
     }
 
-    .comparison-image {
+    .compare-image {
         width: 80px;
         height: 80px;
     }
