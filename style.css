@@ -152,7 +152,7 @@ body {
 }
 
 .game-image {
-    max-width: 100%;
+    max-width: 47vw;
     max-height: 100%;
     object-fit: contain;
     border-radius: 20px;
