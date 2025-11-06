@@ -1,7 +1,7 @@
 // Check URL parameters for game mode
 const urlParams = new URLSearchParams(window.location.search);
 const GAME_MODE = urlParams.get('mode') === 'compare' ? 'compare' : 'single';
-const NUM_IMAGES_PER_GAME = urlParams.get('num') ? parseInt(urlParams.get('num')) : 10;
+const NUM_IMAGES_PER_GAME = urlParams.get('num') ? parseInt(urlParams.get('num')) : -1;
 
 // URL examples:
 // index.html (default single mode)
@@ -56,10 +56,10 @@ class RealOrFakeGame {
             this.shuffledImages = this.shuffleArray([...this.allImages]);
 
             if (this.mode === 'single') {
-                this.totalImages = this.shuffledImages.length;
+                this.totalImages = (this.totalImages === -1) ? this.shuffledImages.length : this.totalImages;
             } else if (this.mode === 'compare') {
                 // In compare mode, total is limited by the smaller set
-                this.totalImages = Math.min(data.real.length, data.fake.length);
+                this.totalImages = (this.totalImages === -1) ? Math.min(data.real.length, data.fake.length) : this.totalImages;
             }
 
             this.elements.total.textContent = this.totalImages;
@@ -109,10 +109,7 @@ class RealOrFakeGame {
     }
 
     async showNextImage() {
-        if (this.mode === 'single' && this.currentImageIndex >= this.shuffledImages.length) {
-            this.endGame();
-            return;
-        } else if (this.mode === 'compare' && this.currentImageIndex >= this.totalImages) {
+        if (this.currentImageIndex >= this.totalImages) {
             this.endGame();
             return;
         }
