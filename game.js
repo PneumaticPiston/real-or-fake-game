@@ -1,15 +1,17 @@
 // Check URL parameters for game mode
 const urlParams = new URLSearchParams(window.location.search);
-const GAME_MODE = urlParams.get('mode') === 'comparison' ? 'comparison' : 'single';
+const GAME_MODE = urlParams.get('mode') === 'compare' ? 'compare' : 'single';
+const NUM_IMAGES_PER_GAME = urlParams.get('num') ? parseInt(urlParams.get('num')) : 10;
+
 // URL examples:
 // index.html (default single mode)
-// index.html?mode=comparison (comparison mode)
+// index.html?mode=compare (compare mode)
 
 class RealOrFakeGame {
     constructor() {
         this.mode = GAME_MODE;
         this.score = 0;
-        this.totalImages = 0;
+        this.totalImages = NUM_IMAGES_PER_GAME;
         this.currentImageIndex = 0;
         this.allImages = [];
         this.shuffledImages = [];
@@ -55,8 +57,8 @@ class RealOrFakeGame {
 
             if (this.mode === 'single') {
                 this.totalImages = this.shuffledImages.length;
-            } else if (this.mode === 'comparison') {
-                // In comparison mode, total is limited by the smaller set
+            } else if (this.mode === 'compare') {
+                // In compare mode, total is limited by the smaller set
                 this.totalImages = Math.min(data.real.length, data.fake.length);
             }
 
@@ -99,11 +101,10 @@ class RealOrFakeGame {
         if (this.mode === 'single') {
             this.elements.buttons.style.display = 'flex';
             this.elements.instructions.style.display = 'none';
-        } else if (this.mode === 'comparison') {
+        } else if (this.mode === 'compare') {
             this.elements.buttons.style.display = 'none';
             this.elements.instructions.style.display = 'block';
         }
-
         this.showNextImage();
     }
 
@@ -111,7 +112,7 @@ class RealOrFakeGame {
         if (this.mode === 'single' && this.currentImageIndex >= this.shuffledImages.length) {
             this.endGame();
             return;
-        } else if (this.mode === 'comparison' && this.currentImageIndex >= this.totalImages) {
+        } else if (this.mode === 'compare' && this.currentImageIndex >= this.totalImages) {
             this.endGame();
             return;
         }
@@ -127,8 +128,8 @@ class RealOrFakeGame {
 
         if (this.mode === 'single') {
             await this.showSingleImage();
-        } else if (this.mode === 'comparison') {
-            await this.showComparisonImages();
+        } else if (this.mode === 'compare') {
+            await this.showcompareImages();
         }
 
         if (!this.isNavigating) {
@@ -159,7 +160,7 @@ class RealOrFakeGame {
         await this.updateBackground(img.src);
     }
 
-    async showComparisonImages() {
+    async showcompareImages() {
         const realImages = this.shuffledImages.filter(img => img.type === 'real');
         const fakeImages = this.shuffledImages.filter(img => img.type === 'fake');
 
@@ -196,17 +197,17 @@ class RealOrFakeGame {
         rightContainer.style.cursor = 'pointer';
         rightContainer.appendChild(rightImg);
 
-        // Add click event listeners for comparison mode
-        leftContainer.addEventListener('click', () => this.makeComparisonGuess('left'));
-        rightContainer.addEventListener('click', () => this.makeComparisonGuess('right'));
+        // Add click event listeners for compare mode
+        leftContainer.addEventListener('click', () => this.makecompareGuess('left'));
+        rightContainer.addEventListener('click', () => this.makecompareGuess('right'));
 
         this.elements.gameArea.innerHTML = '';
         this.elements.gameArea.appendChild(leftContainer);
         this.elements.gameArea.appendChild(rightContainer);
 
-        await this.updateComparisonBackground(leftImg.src, rightImg.src);
+        await this.updatecompareBackground(leftImg.src, rightImg.src);
 
-        this.currentAnswer = 'comparison';
+        this.currentAnswer = 'compare';
         this.leftImageType = images[shuffledPositions[0]].type;
         this.rightImageType = images[shuffledPositions[1]].type;
         this.currentLeftImage = images[shuffledPositions[0]];
@@ -253,7 +254,7 @@ class RealOrFakeGame {
         });
     }
 
-    async updateComparisonBackground(leftSrc, rightSrc) {
+    async updatecompareBackground(leftSrc, rightSrc) {
         return new Promise((resolve) => {
             // Hide single background
             this.elements.background.classList.remove('loaded');
@@ -345,7 +346,7 @@ class RealOrFakeGame {
         }, 1500);  // Increased delay to see animation
     }
 
-    makeComparisonGuess(side) {
+    makecompareGuess(side) {
         if (this.isNavigating) return;  // Don't allow guesses while navigating
         
         const clickedImageType = side === 'left' ? this.leftImageType : this.rightImageType;
@@ -374,7 +375,7 @@ class RealOrFakeGame {
         }
 
         // Add visual feedback to images
-        this.addComparisonImageFeedback(side, correct);
+        this.addcompareImageFeedback(side, correct);
 
         this.elements.score.textContent = this.score;
         this.currentImageIndex++;
@@ -473,7 +474,7 @@ class RealOrFakeGame {
         });
     }
 
-    addComparisonImageFeedback(selectedSide, correct) {
+    addcompareImageFeedback(selectedSide, correct) {
         const images = document.querySelectorAll('.game-image');
         images.forEach((img, index) => {
             const isSelected = (selectedSide === 'left' && index === 0) || 
@@ -561,7 +562,7 @@ class RealOrFakeGame {
                     </div>
                 `;
             } else {
-                // Comparison mode - show both images
+                // compare mode - show both images
                 const imageData = answer.imageData;
                 const leftImageSrc = `images/${imageData.leftImage.type}/${imageData.leftImage.file}`;
                 const rightImageSrc = `images/${imageData.rightImage.type}/${imageData.rightImage.file}`;
@@ -573,11 +574,11 @@ class RealOrFakeGame {
                 resultText = `
                     <div class="result-item ${correctClass}">
                         <div class="result-images">
-                            <div class="comparison-image">
+                            <div class="compare-image">
                                 <img src="${realImageSrc}" alt="Real image" />
                                 <span class="image-label real-label">REAL</span>
                             </div>
-                            <div class="comparison-image">
+                            <div class="compare-image">
                                 <img src="${fakeImageSrc}" alt="Fake image" />
                                 <span class="image-label fake-label">FAKE</span>
                             </div>
