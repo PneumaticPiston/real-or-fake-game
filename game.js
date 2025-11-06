@@ -188,12 +188,12 @@ class RealOrFakeGame {
         await Promise.all([this.loadImagePromise(leftImg), this.loadImagePromise(rightImg)]);
 
         const leftContainer = document.createElement('div');
-        leftContainer.className = 'image-container';
+        leftContainer.className = 'image-container double-image-container';
         leftContainer.style.cursor = 'pointer';
         leftContainer.appendChild(leftImg);
 
         const rightContainer = document.createElement('div');
-        rightContainer.className = 'image-container';
+        rightContainer.className = 'image-container double-image-container';
         rightContainer.style.cursor = 'pointer';
         rightContainer.appendChild(rightImg);
 
