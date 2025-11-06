@@ -1,0 +1,11 @@
+<!-- filepath: c:\Users\pltbo\OneDrive\Desktop Desktop\real-or-fake-game\favicon.svg -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Left lens -->
+  <circle cx="10" cy="16" r="6" fill="#fff" stroke="#000" stroke-width="1"/>
+  <!-- Right lens -->
+  <circle cx="22" cy="16" r="6" fill="#fff" stroke="#000" stroke-width="1"/>
+  <!-- Bridge -->
+  <rect x="16" y="14" width="2" height="4" fill="#000"/>
+  <!-- Split line -->
+  <line x1="16" y1="10" x2="16" y2="26" stroke="#000" stroke-width="1" stroke-dasharray="2 2"/>
+</svg>
