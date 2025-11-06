@@ -147,12 +147,17 @@ body {
 }
 
 .single-image-container {
-    max-width: 60%;
+    max-width: 75%;
     max-height: calc(100vh - 320px);
 }
 
+.single-image-container .game-image {
+    max-width: 90vw !important;
+    width: 60vw !important;
+    max-width: 100%;
+}
+
 .game-image {
-    max-width: 47vw;
     max-height: 100%;
     object-fit: contain;
     border-radius: 20px;
@@ -536,14 +541,6 @@ body {
         font-size: 1rem;
         min-width: 120px;
         width: 200px;
-    }
-
-    .image-container {
-        max-width: 48%;
-    }
-
-    .single-image-container {
-        max-width: 90%;
     }
 
     .game-area {
