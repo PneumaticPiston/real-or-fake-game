@@ -30,7 +30,8 @@ window.IMAGES_DATA = {
         { file: "(4).jpg", type: "fake" },
         { file: "(5).jpg", type: "fake" },
         { file: "(6).jpg", type: "fake" },
-        { file: "(7).jpg", type: "fake" },
+        { file: "(7).jpg", type: "fake" }
+				/*,
         { file: "(9).jpg", type: "fake" },
         { file: "(10).jpg", type: "fake" },
         { file: "(11).jpg", type: "fake" },
@@ -45,5 +46,6 @@ window.IMAGES_DATA = {
         { file: "(20).jpg", type: "fake" },
         { file: "(21).jpg", type: "fake" },
         { file: "(22).jpg", type: "fake" }
+				*/
     ]
 };
